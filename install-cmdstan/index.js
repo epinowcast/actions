@@ -18,8 +18,8 @@ async function run() {
     let cacheHit = await cache.restoreCache([cmdstanPath], cacheKey);
 
     if (!cacheHit) {
-      await exec.exec(`bash ${__dirname}/install_cmdstan_script.sh`, [cmdstanVersion, cmdstanPath]);
-
+      const numCores = core.getInput('num-cores');
+      await exec.exec(`bash ${__dirname}/install_cmdstan_script.sh`, [cmdstanVersion, cmdstanPath, numCores]);
       try {
         await cache.saveCache([cmdstanPath], cacheKey);
       } catch (error) {
