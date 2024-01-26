@@ -5,21 +5,23 @@ const axios = require('axios');
 
 async function run() {
   try {
-    let cmdstanVersion = core.getInput('cmdstan-version');
-
-    if (cmdstanVersion === 'latest') {
-      const response = await axios.get('https://api.github.com/repos/stan-dev/cmdstan/releases/latest');
-      cmdstanVersion = response.data.tarball_url.split('/').pop().split('v').pop();
-    }
-
+    const cmdstanVersion = core.getInput('cmdstan-version') === 'latest'
+      ? await getLatestCmdStanVersion()
+      : core.getInput('cmdstan-version');
     const cmdstanPath = process.env['HOME'] + '/.cmdstan';
+    const numCores = core.getInput('num-cores');
     const cacheKey = `cmdstan-${cmdstanVersion}`;
+    const runnerOs = process.env['RUNNER_OS'];
 
     let cacheHit = await cache.restoreCache([cmdstanPath], cacheKey);
 
     if (!cacheHit) {
-      const numCores = core.getInput('num-cores');
-      await exec.exec(`bash ${__dirname}/install_cmdstan_script.sh`, [cmdstanVersion, cmdstanPath, numCores]);
+      if (runnerOs === 'Windows') {
+        await exec.exec(`powershell ${__dirname}/install_cmdstan_win.ps1`, [cmdstanVersion, cmdstanPath, numCores]);
+      } else {
+        await exec.exec(`bash ${__dirname}/install_cmdstan_script.sh`, [cmdstanVersion, cmdstanPath, numCores]);
+      }
+
       try {
         await cache.saveCache([cmdstanPath], cacheKey);
       } catch (error) {
@@ -34,6 +36,11 @@ async function run() {
   } catch (error) {
     core.setFailed(error.message);
   }
+}
+
+async function getLatestCmdStanVersion() {
+  const response = await axios.get('https://api.github.com/repos/stan-dev/cmdstan/releases/latest');
+  return response.data.tarball_url.split('/').pop().split('v').pop();
 }
 
 run();
