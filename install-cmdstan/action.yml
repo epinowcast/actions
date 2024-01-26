@@ -1,0 +1,10 @@
+name: 'Install CmdStan with caching'
+description: 'Install CmdStan with caching'
+inputs:
+  cmdstan-version:
+    description: 'CmdStan version to install (use "latest" for the latest version)'
+    required: false
+    default: 'latest'
+runs:
+  using: 'node12'
+  main: 'index.js'
