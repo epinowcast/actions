@@ -5,6 +5,10 @@ inputs:
     description: 'CmdStan version to install (use "latest" for the latest version)'
     required: false
     default: 'latest'
+  num-cores:
+    description: 'Number of cores to use for building CmdStan'
+    required: false
+    default: '1'
 runs:
   using: 'node12'
   main: 'index.js'
