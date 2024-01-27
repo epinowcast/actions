@@ -36,8 +36,7 @@ runs:
     - name: Restore Cache
       uses: actions/cache@v3
       with:
-        path: |
-          ${{ runner.os == 'Windows' && 'C:\.cmdstan\cmdstan-${{ env.CMDSTAN_VERSION }}' || '~/.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}' }}
+        path: 'cmdstan\cmdstan-${{ env.CMDSTAN_VERSION }}'
         key: cmdstan-${{ env.CMDSTAN_VERSION }}
 
     - name: Install CmdStan (Unix)
