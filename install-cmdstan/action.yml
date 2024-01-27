@@ -16,7 +16,7 @@ runs:
     - name: Determine CmdStan Version
       run: |
         if [ "${{ inputs.cmdstan-version }}" = "latest" ]; then
-          if [ ${{ runner.os }} = "Windows" ]; then
+          if [ "${{ runner.os }}" = "Windows" ]; then
             $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest"
             $version = $response.tag_name -replace '^v', ''
             echo "CMDSTAN_VERSION=$version" | Out-File -Append -FilePath $env:GITHUB_ENV
@@ -33,15 +33,17 @@ runs:
     - name: Restore Cache
       uses: actions/cache@v3
       with:
-        path: ~/.cmdstan
+        path: |
+          ~/.cmdstan
+          ${{ runner.os == 'Windows' && 'C:\.cmdstan' || '~/.cmdstan' }}
         key: cmdstan-${{ env.CMDSTAN_VERSION }}
 
     - name: Install CmdStan (Unix)
       if: runner.os != 'Windows' && steps.cache.outputs.cache-hit != 'true'
-      run: bash ${{ github.action_path }}/install_cmdstan.sh ${{ env.CMDSTAN_VERSION }} ${{ inputs.num-cores }}
+      run: bash ${{ github.action_path }}/scripts/install_cmdstan.sh ${{ env.CMDSTAN_VERSION }} ${{ inputs.num-cores }}
       shell: bash
 
     - name: Install CmdStan (Windows)
       if: runner.os == 'Windows' && steps.cache.outputs.cache-hit != 'true'
-      run: powershell ${{ github.action_path }}/install_cmdstan_win.ps1 -version ${{ env.CMDSTAN_VERSION }} -numCores ${{ inputs.num-cores }}
+      run: pwsh ${{ github.action_path }}/scripts/install_cmdstan_win.ps1 -version ${{ env.CMDSTAN_VERSION }} -numCores ${{ inputs.num-cores }}
       shell: pwsh
