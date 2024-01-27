@@ -47,5 +47,5 @@ jobs:
       run: |
         install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
         cmdstanr::check_cmdstan_toolchain()
-      shell: Rscript
+      shell: Rscript {0}
 
