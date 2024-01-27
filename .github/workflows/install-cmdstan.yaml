@@ -21,31 +21,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Determine Ref for Action
-      id: get-ref
-      run: |
-        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-          echo "Ref=${{ github.head_ref }}"
-          echo "::set-output name=ref::${{ github.head_ref }}"
-        else
-          echo "Ref=${{ github.ref_name }}"
-          echo "::set-output name=ref::${{ github.ref_name }}"
-        fi
-
     - name: Determine Number of Cores
-      id: set-cores
       run: |
         if [ "${{ runner.os }}" = "Windows" ]; then
-          echo "::set-output name=num_cores::$(echo %NUMBER_OF_PROCESSORS%)"
+          echo $(echo %NUMBER_OF_PROCESSORS%)
         else
-          echo "::set-output name=num_cores::$(nproc)"
+          echo $(nproc)
         fi
 
-    - name: Install CmdStan
-      uses: epinowcast/actions/install-cmdstan@${{ steps.get-ref.outputs.ref }}
+    - name: Install CmdStan (Main Branch)
+      uses: epinowcast/actions/install-cmdstan@main
       with:
         cmdstan-version: 'latest'
-        cores: ${{ steps.set-cores.outputs.num_cores }}
     
     - name: Validate Installation
       run: |
