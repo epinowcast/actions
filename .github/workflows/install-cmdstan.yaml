@@ -1,1 +1,45 @@
+name: Test CmdStan Installation Action
 
+on:
+  push:
+    branches: 
+      - '*'
+    tags:
+      - 'v*'
+  pull_request:
+
+jobs:
+  test-installation:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Determine Number of Cores
+      id: set-cores
+      run: |
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          echo "::set-output name=num_cores::$(echo %NUMBER_OF_PROCESSORS%)"
+        else
+          echo "::set-output name=num_cores::$(nproc)"
+        fi
+
+    - name: Install CmdStan
+      uses: epinowcast/actions/install-cmdstan@${{ github.sha }}
+      with:
+        cmdstan-version: 'latest'
+        cores: ${{ steps.set-cores.outputs.num_cores }}
+    
+    - name: Validate Installation
+      run: |
+        echo "CmdStan installed in: ${CMDSTAN_PATH}"
+        if [ -d "${CMDSTAN_PATH}" ]; then
+          echo "CmdStan directory found."
+        else
+          echo "CmdStan directory not found."
+          exit 1
+        fi
