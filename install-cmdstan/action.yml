@@ -13,22 +13,25 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Determine CmdStan Version
+    - name: Determine CmdStan Version (Unix)
+      if: runner.os != 'Windows' && inputs.cmdstan-version == 'latest'
       run: |
-        if [ "${{ inputs.cmdstan-version }}" = "latest" ]; then
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest"
-            $version = $response.tag_name -replace '^v', ''
-            echo "CMDSTAN_VERSION=$version" | Out-File -Append -FilePath $env:GITHUB_ENV
-          else
-            version=$(curl -s https://api.github.com/repos/stan-dev/cmdstan/releases/latest | awk -F '"' '/tag_name/{print $4}' | sed 's/^v//')
-            echo "CMDSTAN_VERSION=$version" >> $GITHUB_ENV
-          fi
-        else
-          version=${{ inputs.cmdstan-version }}
-          echo "CMDSTAN_VERSION=$version" >> $GITHUB_ENV
-        fi
-      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+        version=$(curl -s https://api.github.com/repos/stan-dev/cmdstan/releases/latest | awk -F '"' '/tag_name/{print $4}' | sed 's/^v//')
+        echo "CMDSTAN_VERSION=$version" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Determine CmdStan Version (Windows)
+      if: runner.os == 'Windows' && inputs.cmdstan-version == 'latest'
+      run: |
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest"
+        $version = $response.tag_name -replace '^v', ''
+        echo "CMDSTAN_VERSION=$version" | Out-File -Append -FilePath $env:GITHUB_ENV
+      shell: pwsh
+
+    - name: Set CmdStan Version (Specified)
+      if: inputs.cmdstan-version != 'latest'
+      run: echo "CMDSTAN_VERSION=${{ inputs.cmdstan-version }}" >> $GITHUB_ENV
+      shell: bash
 
     - name: Restore Cache
       uses: actions/cache@v3
