@@ -1,4 +1,4 @@
-name: Test CmdStan Installation Action
+name: Test Install CmdStan Action
 
 on:
   push:
@@ -39,27 +39,13 @@ jobs:
       uses: epinowcast/actions/install-cmdstan@main
       with:
         cmdstan-version: 'latest'
-    
-    - name: Validate Installation (Unix)
-      if: runner.os != 'Windows'
-      run: |
-        echo "CmdStan installed in: ${CMDSTAN_PATH}"
-        if [ -d "${CMDSTAN_PATH}" ]; then
-          echo "CmdStan directory found."
-        else
-          echo "CmdStan directory not found."
-          exit 1
-        fi
-      shell: bash
 
-    - name: Validate Installation (Windows)
-      if: runner.os == 'Windows'
+    - name: Set up R
+      uses: r-lib/actions/setup-r@v2
+
+    - name: Validate Installation
       run: |
-        Write-Host "CmdStan installed in: $env:CMDSTAN_PATH"
-        if (Test-Path -Path $env:CMDSTAN_PATH) {
-          Write-Host "CmdStan directory found."
-        } else {
-          Write-Host "CmdStan directory not found."
-          exit 1
-        }
-      shell: pwsh
+        install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
+        cmdstanr::check_cmdstan_toolchain()
+      shell: Rscript
+
