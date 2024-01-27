@@ -14,21 +14,23 @@ runs:
   using: 'composite'
   steps:
     - name: Determine CmdStan Version
-      id: version
       run: |
         if [ "${{ inputs.cmdstan-version }}" = "latest" ]; then
-          version=$(curl -s https://api.github.com/repos/stan-dev/cmdstan/releases/latest | awk -F '"' '/tag_name/{print $4}' | sed 's/^v//')
+          if [ ${{ runner.os }} = "Windows" ]; then
+            $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest"
+            $version = $response.tag_name -replace '^v', ''
+            echo "CMDSTAN_VERSION=$version" | Out-File -Append -FilePath $env:GITHUB_ENV
+          else
+            version=$(curl -s https://api.github.com/repos/stan-dev/cmdstan/releases/latest | awk -F '"' '/tag_name/{print $4}' | sed 's/^v//')
+            echo "CMDSTAN_VERSION=$version" >> $GITHUB_ENV
+          fi
         else
           version=${{ inputs.cmdstan-version }}
+          echo "CMDSTAN_VERSION=$version" >> $GITHUB_ENV
         fi
-        if [[ $version == v* ]]; then
-          version=${version:1}
-        fi
-        echo "CMDSTAN_VERSION=$version" >> $GITHUB_ENV
-      shell: bash
+      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
 
     - name: Restore Cache
-      id: cache
       uses: actions/cache@v3
       with:
         path: ~/.cmdstan
@@ -36,10 +38,10 @@ runs:
 
     - name: Install CmdStan (Unix)
       if: runner.os != 'Windows' && steps.cache.outputs.cache-hit != 'true'
-      run: bash ${{ github.action_path }}/install_cmdstan.sh ${{ env.CMDSTAN_VERSION }} ${{ inputs.num-cores }}
+      run: bash ${{ github.action_path }}/scripts/install_cmdstan.sh ${{ env.CMDSTAN_VERSION }} ${{ inputs.num-cores }}
       shell: bash
 
     - name: Install CmdStan (Windows)
       if: runner.os == 'Windows' && steps.cache.outputs.cache-hit != 'true'
-      run: powershell ${{ github.action_path }}/install_cmdstan_win.ps1 -version ${{ env.CMDSTAN_VERSION }} -numCores ${{ inputs.num-cores }}
+      run: powershell ${{ github.action_path }}/scripts/install_cmdstan.ps1 -version ${{ env.CMDSTAN_VERSION }} -numCores ${{ inputs.num-cores }}
       shell: pwsh
