@@ -17,7 +17,7 @@ runs:
       id: version
       run: |
         if [ "${{ inputs.cmdstan-version }}" = "latest" ]; then
-          version=$(curl -s https://api.github.com/repos/stan-dev/cmdstan/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+          version=$(curl -s https://api.github.com/repos/stan-dev/cmdstan/releases/latest | awk -F '"' '/tag_name/{print $4}' | sed 's/^v//')
         else
           version=${{ inputs.cmdstan-version }}
         fi
