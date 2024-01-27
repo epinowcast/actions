@@ -24,7 +24,7 @@ jobs:
     - name: Determine Ref for Action
       id: get-ref
       run: |
-        if [ "${{ github.event_name }}" = "pull_request" ]; then
+        if [[ "${{ github.event_name }}" == "pull_request" ]]; then
           echo "Ref=${{ github.head_ref }}"
           echo "::set-output name=ref::${{ github.head_ref }}"
         else
