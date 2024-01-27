@@ -2,11 +2,13 @@ name: Test CmdStan Installation Action
 
 on:
   push:
-    branches: 
+    branches:
       - '*'
     tags:
       - 'v*'
   pull_request:
+    branches:
+      - '*'
 
 jobs:
   test-installation:
@@ -19,6 +21,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
+    - name: Determine Ref for Action
+      id: get-ref
+      run: |
+        if [ "${{ github.event_name }}" = "pull_request" ]; then
+          echo "Ref=${{ github.head_ref }}"
+          echo "::set-output name=ref::${{ github.head_ref }}"
+        else
+          echo "Ref=${{ github.ref_name }}"
+          echo "::set-output name=ref::${{ github.ref_name }}"
+        fi
+
     - name: Determine Number of Cores
       id: set-cores
       run: |
@@ -29,7 +42,7 @@ jobs:
         fi
 
     - name: Install CmdStan
-      uses: epinowcast/actions/install-cmdstan@${{ github.sha }}
+      uses: epinowcast/actions/install-cmdstan@${{ steps.get-ref.outputs.ref }}
       with:
         cmdstan-version: 'latest'
         cores: ${{ steps.set-cores.outputs.num_cores }}
