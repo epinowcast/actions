@@ -1,10 +1,10 @@
 param (
     [string]$version,
-    [string]$cmdstanPath,
     [int]$numCores = 1
 )
 
 function Install-CmdStan {
+    $cmdstanPath = ".cmdstan"
     $cmdstanUrl = "https://github.com/stan-dev/cmdstan/releases/download/v$version/cmdstan-$version.tar.gz"
     $cmdstanTarGz = "cmdstan-$version.tar.gz"
     $cmdstanDir = "cmdstan-$version"
