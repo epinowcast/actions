@@ -38,10 +38,10 @@ runs:
 
     - name: Install CmdStan (Unix)
       if: runner.os != 'Windows' && steps.cache.outputs.cache-hit != 'true'
-      run: bash ${{ github.action_path }}/scripts/install_cmdstan.sh ${{ env.CMDSTAN_VERSION }} ${{ inputs.num-cores }}
+      run: bash ${{ github.action_path }}/install_cmdstan.sh ${{ env.CMDSTAN_VERSION }} ${{ inputs.num-cores }}
       shell: bash
 
     - name: Install CmdStan (Windows)
       if: runner.os == 'Windows' && steps.cache.outputs.cache-hit != 'true'
-      run: powershell ${{ github.action_path }}/scripts/install_cmdstan.ps1 -version ${{ env.CMDSTAN_VERSION }} -numCores ${{ inputs.num-cores }}
+      run: powershell ${{ github.action_path }}/install_cmdstan_win.ps1 -version ${{ env.CMDSTAN_VERSION }} -numCores ${{ inputs.num-cores }}
       shell: pwsh
