@@ -21,6 +21,9 @@ runs:
         else
           version=${{ inputs.cmdstan-version }}
         fi
+        if [[ $version == v* ]]; then
+          version=${version:1}
+        fi
         echo "CMDSTAN_VERSION=$version" >> $GITHUB_ENV
       shell: bash
 
