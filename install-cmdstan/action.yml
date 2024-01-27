@@ -9,6 +9,34 @@ inputs:
     description: 'Number of cores to use for building CmdStan'
     required: false
     default: '1'
+
 runs:
-  using: 'node20'
-  main: 'index.js'
+  using: 'composite'
+  steps:
+    - name: Determine CmdStan Version
+      id: version
+      run: |
+        if [ "${{ inputs.cmdstan-version }}" = "latest" ]; then
+          version=$(curl -s https://api.github.com/repos/stan-dev/cmdstan/releases/latest | grep -oP '"tag_name": "\K(.*)(?=")')
+        else
+          version=${{ inputs.cmdstan-version }}
+        fi
+        echo "CMDSTAN_VERSION=$version" >> $GITHUB_ENV
+      shell: bash
+
+    - name: Restore Cache
+      id: cache
+      uses: actions/cache@v3
+      with:
+        path: ~/.cmdstan
+        key: cmdstan-${{ env.CMDSTAN_VERSION }}
+
+    - name: Install CmdStan (Unix)
+      if: runner.os != 'Windows' && steps.cache.outputs.cache-hit != 'true'
+      run: bash ${{ github.action_path }}/install_cmdstan.sh ${{ env.CMDSTAN_VERSION }} ${{ inputs.num-cores }}
+      shell: bash
+
+    - name: Install CmdStan (Windows)
+      if: runner.os == 'Windows' && steps.cache.outputs.cache-hit != 'true'
+      run: powershell ${{ github.action_path }}/install_cmdstan_win.ps1 -version ${{ env.CMDSTAN_VERSION }} -numCores ${{ inputs.num-cores }}
+      shell: pwsh
