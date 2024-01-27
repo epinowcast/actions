@@ -22,24 +22,40 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Determine Number of Cores
+      id: set-cores
       run: |
-        if [ "${{ runner.os }}" = "Windows" ]; then
-          echo $(echo %NUMBER_OF_PROCESSORS%)
-        else
-          echo $(nproc)
-        fi
+        if ($env:RUNNER_OS -eq "Windows") {
+          $numCores = [Environment]::ProcessorCount
+          echo "NUM_CORES=$numCores" | Out-File -Append -FilePath $env:GITHUB_ENV
+        } else {
+          numCores=$(nproc)
+          echo "NUM_CORES=$numCores" >> $GITHUB_ENV
+        }
+      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
 
-    - name: Install CmdStan (Main Branch)
+    - name: Install CmdStan
       uses: epinowcast/actions/install-cmdstan@main
       with:
         cmdstan-version: 'latest'
     
     - name: Validate Installation
       run: |
-        echo "CmdStan installed in: ${CMDSTAN_PATH}"
-        if [ -d "${CMDSTAN_PATH}" ]; then
-          echo "CmdStan directory found."
-        else
-          echo "CmdStan directory not found."
-          exit 1
-        fi
+        if ($env:RUNNER_OS -eq "Windows") {
+          Write-Host "CmdStan installed in: $env:CMDSTAN_PATH"
+          if (Test-Path -Path $env:CMDSTAN_PATH) {
+            Write-Host "CmdStan directory found."
+          } else {
+            Write-Host "CmdStan directory not found."
+            exit 1
+          }
+        } else {
+          echo "CmdStan installed in: ${CMDSTAN_PATH}"
+          if [ -d "${CMDSTAN_PATH}" ]; then
+            echo "CmdStan directory found."
+          else
+            echo "CmdStan directory not found."
+            exit 1
+          fi
+        }
+      shell: ${{ runner.os == 'Windows' && 'pwsh' || 'bash' }}
+
