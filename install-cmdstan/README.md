@@ -1,6 +1,6 @@
 # Install CmdStan GitHub Action
 
-This action installs and caches CmdStan, allowing specification of version and number of cores for building.
+This action installs and caches [CmdStan](https://mc-stan.org/users/interfaces/cmdstan), allowing specification of version and number of cores for building.
 
 ## Inputs
 
