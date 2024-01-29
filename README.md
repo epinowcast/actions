@@ -8,7 +8,7 @@ Below is a list of the available actions in this repository, along with a brief 
 
 ### 1. Install and cache CmdStan (`install-cmdstan`)
 
-This action installs and caches CmdStan. It allows specifying a version of CmdStan and supports using multiple cores for installation. It is adaptable for both Linux/Mac and Windows runners.
+This action installs and caches [CmdStan](https://mc-stan.org/users/interfaces/cmdstan). It allows specifying a version of CmdStan and supports using multiple cores for installation. It is adaptable for both Linux/Mac and Windows runners.
 
 - [`install-cmdstan`](install-cmdstan/README.md)
 
