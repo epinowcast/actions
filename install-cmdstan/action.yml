@@ -34,9 +34,9 @@ runs:
       shell: bash
 
     - name: Restore Cache
-      uses: actions/cache@v3
+      id: cache-cmdstan
+      uses: actions/cache@v4
       with:
-        id: cache-cmdstan
         path: '.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}'
         key: cmdstan-${{ env.CMDSTAN_VERSION }}
  
