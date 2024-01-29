@@ -19,24 +19,17 @@ jobs:
     runs-on: ${{ matrix.os }}
     
     steps:
-    - name: Determine Number of Cores (Unix)
-      if: runner.os != 'Windows'
-      run: |
-        numCores=$(nproc)
-        echo "NUM_CORES=$numCores" >> $GITHUB_ENV
-      shell: bash
-
-    - name: Determine Number of Cores (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        $numCores = [Environment]::ProcessorCount
-        echo "NUM_CORES=$numCores" | Out-File -Append -FilePath $env:GITHUB_ENV
-      shell: pwsh
-
-    - name: Install CmdStan
+    - name: Install Cmdstan (1)
       uses: epinowcast/actions/install-cmdstan@main
       with:
         cmdstan-version: 'latest'
+        num-cores: 2
+
+    - name: Install Cmdstan (2)
+      uses: epinowcast/actions/install-cmdstan@main
+      with:
+        cmdstan-version: 'latest'
+        num-cores: 1
 
     - name: Set up R
       uses: r-lib/actions/setup-r@v2
