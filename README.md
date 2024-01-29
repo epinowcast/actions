@@ -32,4 +32,4 @@ We welcome contributions to improve the actions in this repository. Please read 
 
 ## License
 
-This repository and its actions are licensed under [appropriate license, e.g., MIT License]. See the [LICENSE](LICENSE) file for more details.
+This repository and its actions are licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
