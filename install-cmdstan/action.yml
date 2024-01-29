@@ -36,15 +36,16 @@ runs:
     - name: Restore Cache
       uses: actions/cache@v3
       with:
-        path: '.cmdstan\cmdstan-${{ env.CMDSTAN_VERSION }}'
+        id: cache-cmdstan
+        path: '.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}'
         key: cmdstan-${{ env.CMDSTAN_VERSION }}
-
+ 
     - name: Install CmdStan (Unix)
-      if: runner.os != 'Windows' && steps.cache.outputs.cache-hit != 'true'
+      if: runner.os != 'Windows' && steps.cache-cmdstan.outputs.cache-hit != 'true'
       run: bash ${{ github.action_path }}/scripts/install_cmdstan.sh ${{ env.CMDSTAN_VERSION }} ${{ inputs.num-cores }}
       shell: bash
 
     - name: Install CmdStan (Windows)
-      if: runner.os == 'Windows' && steps.cache.outputs.cache-hit != 'true'
+      if: runner.os == 'Windows' && steps.cache-cmdstan.outputs.cache-hit != 'true'
       run: pwsh ${{ github.action_path }}/scripts/install_cmdstan_win.ps1 -version ${{ env.CMDSTAN_VERSION }} -numCores ${{ inputs.num-cores }}
       shell: pwsh
