@@ -26,4 +26,4 @@ Invoke-WebRequest -Uri $cmdstanUrl -OutFile $cmdstanTarGz
 Set-Location -Path "cmdstan-$version"
 
 # Build CmdStan
-& make -j$numCores build
+& make -j$([int]$numCores) build
