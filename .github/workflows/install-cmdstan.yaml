@@ -42,6 +42,7 @@ jobs:
     - name: Validate the latest CmdStan is installed correctly
       run: |
         cmdstanr::check_cmdstan_toolchain()
+        cmdstanr::cmdstan_version()
       shell: Rscript {0}
 
     - name: Install Cmdstan 2.33.1 (1)
@@ -58,7 +59,7 @@ jobs:
 
     - name: Validate CmdStan 2.33.1 is installed correctly
       run: |
-        cmdstanr::set_cmdstan_path("~/.cmdstan/cmdstan-2.33.1")
+        cmdstanr::set_cmdstan_path(".cmdstan/cmdstan-2.33.1")
         cmdstanr::check_cmdstan_toolchain()
         stopifnot("Version is not 2.33.1" = cmdstanr::cmdstan_version() == "2.33.1")
       shell: Rscript {0}
