@@ -3,7 +3,7 @@ param (
     [int]$numCores = 1
 )
 
-# Function to install Rtools
+# Function to install Rtools and add its toolchain directories to the system PATH
 function Install-Rtools {
     Write-Host "Checking for the latest version of Rtools..."
 
@@ -11,34 +11,55 @@ function Install-Rtools {
     $rtoolsUrl = "https://cran.r-project.org/bin/windows/Rtools/"
     $pageContent = Invoke-WebRequest -Uri $rtoolsUrl -UseBasicParsing
     $latestRtools = ($pageContent.Links | Where-Object { $_.href -match 'rtools.*exe$' } | Select-Object -First 1).href
+    if (-not $latestRtools) {
+        Write-Host "Could not find the latest Rtools installer."
+        exit 1
+    }
     $rtoolsDownloadUrl = $rtoolsUrl + $latestRtools
+    $rtoolsFileName = Split-Path -Leaf $rtoolsDownloadUrl
 
-    Write-Host "Latest Rtools version found: $latestRtools"
+    Write-Host "Latest Rtools version found: $rtoolsFileName"
     Write-Host "Downloading Rtools from: $rtoolsDownloadUrl"
 
+    # Define the installer path
+    $installerPath = Join-Path $env:TEMP $rtoolsFileName
+    if (-not (Test-Path $env:TEMP)) {
+        New-Item -ItemType Directory -Force -Path $env:TEMP
+    }
+
     # Download the latest Rtools installer
-    $installerPath = Join-Path $env:TEMP $latestRtools
-    Invoke-WebRequest -Uri $rtoolsDownloadUrl -OutFile $installerPath
+    try {
+        Invoke-WebRequest -Uri $rtoolsDownloadUrl -OutFile $installerPath
+    } catch {
+        Write-Host "Failed to download Rtools: $_"
+        exit 1
+    }
 
     Write-Host "Installing Rtools..."
-    Start-Process -FilePath $installerPath -Args '/VERYSILENT' -Wait
+    try {
+        Start-Process -FilePath $installerPath -Args '/VERYSILENT' -Wait
+    } catch {
+        Write-Host "Failed to install Rtools: $_"
+        exit 1
+    }
 
     Write-Host "Rtools has been installed."
+
+    # Detect Rtools installation directory and add it to the system PATH
+    $rtoolsDir = "C:\rtools" + $rtoolsFileName -replace 'rtools', '' -replace '.exe', ''
+    $rtoolsUsrBinPath = Join-Path -Path $rtoolsDir -ChildPath "usr\bin"
+    $rtoolsMingwBinPath = Join-Path -Path $rtoolsDir -ChildPath "mingw64\bin"
+    Write-Host "Adding Rtools to system PATH: $rtoolsUsrBinPath and $rtoolsMingwBinPath"
+    $env:PATH += ";$rtoolsUsrBinPath;$rtoolsMingwBinPath"
 }
 
-# Check if Rtools is on the system PATH by checking for the presence of directories starting with 'rtools'
-$hasRtools = $false
-foreach ($path in $env:PATH.Split(';')) {
-    if ($path -match '\\rtools[0-9]+\\') {
-        $hasRtools = $true
-        break
-    }
-}
-if (-not $hasRtools) {
-    Write-Host "Rtools is not on the system PATH. Installing the latest version."
+# Check if Rtools 'make' is on the system PATH
+$makePath = (Get-Command make -ErrorAction SilentlyContinue).Source
+if ($null -eq $makePath) {
+    Write-Host "Rtools 'make' is not on the system PATH. Checking if Rtools is installed..."
     Install-Rtools
 } else {
-    Write-Host "Rtools is already installed and on the system PATH."
+    Write-Host "Rtools is already installed and 'make' is on the system PATH."
 }
 
 # Define CmdStan directory path
