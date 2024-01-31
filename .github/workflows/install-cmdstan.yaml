@@ -42,6 +42,7 @@ jobs:
     - name: Validate the latest CmdStan is installed correctly
       run: |
         cmdstanr::check_cmdstan_toolchain()
+        cmdstanr::cmdstan_path()
         cmdstanr::cmdstan_version()
       shell: Rscript {0}
 
