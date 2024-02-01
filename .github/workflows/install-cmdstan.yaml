@@ -41,6 +41,7 @@ jobs:
       
     - name: Validate the latest CmdStan is installed correctly
       run: |
+        cmdstanr::set_cmdstan_path()
         cmdstanr::check_cmdstan_toolchain()
         cmdstanr::cmdstan_path()
         cmdstanr::cmdstan_version()
