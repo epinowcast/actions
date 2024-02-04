@@ -32,15 +32,12 @@ runs:
       id: cache-cmdstan
       uses: actions/cache@v4
       with:
-        path: '.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}'
+        path: '~/.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}'
         key: ${{ runner.os }}-cmdstan-${{ env.CMDSTAN_VERSION }}
  
-    - name: Install CmdStan (Unix)
-      if: runner.os != 'Windows' && steps.cache-cmdstan.outputs.cache-hit != 'true'
-      run: bash ${{ github.action_path }}/scripts/install-cmdstan.sh ${{ env.CMDSTAN_VERSION }} ${{ inputs.num-cores }}
+    - name: Install CmdStan using cmdstanr
+      if: steps.cache-cmdstan.outputs.cache-hit != 'true'
+      run: |
+        Rscript -e 'cmdstanr::install_cmdstan(version = ${{ env.CMDSTAN_VERSION }}, cores = ${{ inputs.num-cores }})'
+        Rscript -e 'cmdstanr::set_cmdstan_path("~/.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}")'
       shell: bash
-
-    - name: Install CmdStan (Windows)
-      if: runner.os == 'Windows' && steps.cache-cmdstan.outputs.cache-hit != 'true'
-      run: pwsh ${{ github.action_path }}/scripts/install-cmdstan_win.ps1 -version ${{ env.CMDSTAN_VERSION }} -numCores ${{ inputs.num-cores }}
-      shell: pwsh
