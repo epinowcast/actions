@@ -17,19 +17,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    
-    steps:
-    - name: Install the latest Cmdstan (1)
-      uses: epinowcast/actions/install-cmdstan@main
-      with:
-        cmdstan-version: 'latest'
-        num-cores: 2
-
-    - name: Install the latest Cmdstan (2)
-      uses: epinowcast/actions/install-cmdstan@main
-      with:
-        cmdstan-version: 'latest'
-        num-cores: 1
 
     - name: Set up R
       uses: r-lib/actions/setup-r@v2
@@ -38,22 +25,22 @@ jobs:
       run: |
         install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
       shell: Rscript {0}
+    
+    steps:
+    - name: Install the latest Cmdstan
+      uses: epinowcast/actions/install-cmdstan@main
+      with:
+        cmdstan-version: 'latest'
+        num-cores: 2
       
     - name: Validate the latest CmdStan is installed correctly
       run: |
-        cmdstanr::set_cmdstan_path()
         cmdstanr::check_cmdstan_toolchain()
         cmdstanr::cmdstan_path()
         cmdstanr::cmdstan_version()
       shell: Rscript {0}
 
-    - name: Install Cmdstan 2.33.1 (1)
-      uses: epinowcast/actions/install-cmdstan@main
-      with:
-        cmdstan-version: '2.33.1'
-        num-cores: 2
-
-    - name: Install Cmdstan 2.33.1 (2)
+    - name: Install Cmdstan 2.33.1
       uses: epinowcast/actions/install-cmdstan@main
       with:
         cmdstan-version: '2.33.1'
@@ -61,7 +48,8 @@ jobs:
 
     - name: Validate CmdStan 2.33.1 is installed correctly
       run: |
-        cmdstanr::set_cmdstan_path(".cmdstan/cmdstan-2.33.1")
         cmdstanr::check_cmdstan_toolchain()
+        cmdstanr::cmdstan_path()
+        cmdstanr::cmdstan_version()
         stopifnot("Version is not 2.33.1" = cmdstanr::cmdstan_version() == "2.33.1")
       shell: Rscript {0}
