@@ -15,16 +15,7 @@ runs:
   steps:
     - name: Determine CmdStan Version (Unix)
       if: runner.os != 'Windows' && inputs.cmdstan-version == 'latest'
-      run: |
-        if [ "${{ runner.os }}" = "Linux" ]; then
-          apt-get update
-          apt-get install -y jq
-        elif [ "${{ runner.os }}" = "macOS" ]; then
-          brew install jq
-        fi
-        version=$(curl -s https://api.github.com/repos/stan-dev/cmdstan/releases/latest | jq -r '.tag_name' | tr -d 'v')
-        echo "CMDSTAN_VERSION=$version" >> $GITHUB_ENV
-      shell: bash
+      run: ./scripts/get-latest-release.sh
 
     - name: Determine CmdStan Version (Windows)
       if: runner.os == 'Windows' && inputs.cmdstan-version == 'latest'
