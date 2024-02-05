@@ -15,7 +15,9 @@ runs:
   steps:
     - name: Determine CmdStan Version (Unix)
       if: runner.os != 'Windows' && inputs.cmdstan-version == 'latest'
-      run: ${{ github.action_path }}/scripts/get-latest-release.sh
+      run: |
+        chmod +x ${{ github.action_path }}/scripts/get-latest-release.sh
+        ${{ github.action_path }}/scripts/get-latest-release.sh
       shell: bash
 
     - name: Determine CmdStan Version (Windows)
