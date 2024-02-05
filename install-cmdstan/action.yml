@@ -16,6 +16,7 @@ runs:
     - name: Determine CmdStan Version (Unix)
       if: runner.os != 'Windows' && inputs.cmdstan-version == 'latest'
       run: ./scripts/get-latest-release.sh
+      shell: bash
 
     - name: Determine CmdStan Version (Windows)
       if: runner.os == 'Windows' && inputs.cmdstan-version == 'latest'
