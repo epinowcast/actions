@@ -35,7 +35,7 @@ runs:
       uses: actions/cache@v4
       with:
         path: '~/.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}'
-        key: ${{ runner.os }}-cmdstan-${{ env.CMDSTAN_VERSION }}
+        key: cmdstan-${{ env.CMDSTAN_VERSION }}
 
     - name: Check the CmdStan toolchain and repair it if required
       if: steps.cache-cmdstan.outputs.cache-hit != 'true'
