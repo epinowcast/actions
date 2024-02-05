@@ -1,13 +1,27 @@
-# PowerShell script to fetch the latest CmdStan release version
+# PowerShell script to fetch the latest CmdStan release version with retry logic
 
-# Fetch the latest release data from the GitHub API
-$response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest"
+# Initialize retry parameters
+$max_attempts = 5
+$wait_time = 5 # seconds
 
-# Extract the version, removing the 'v' prefix if it exists
-$version = $response.tag_name -replace '^v', ''
+for ($attempt = 1; $attempt -le $max_attempts; $attempt++) {
+    try {
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -ErrorAction Stop
+        $version = $response.tag_name -replace '^v', ''
 
-# Pass the version to the GitHub environment
-"CMDSTAN_VERSION=$version" | Out-File -Append -FilePath $env:GITHUB_ENV
+        if (-not [string]::IsNullOrWhiteSpace($version)) {
+            "CMDSTAN_VERSION=$version" | Out-File -Append -FilePath $env:GITHUB_ENV
+            Write-Host "CmdStan latest version: $version"
+            break
+        }
+    } catch {
+        Write-Host "Attempt $attempt of $max_attempts failed. Retrying in $wait_time seconds..."
+        Start-Sleep -Seconds $wait_time
+        $wait_time = $wait_time * 2
+    }
+}
 
-# Output the fetched version
-Write-Host "CmdStan latest version: $version"
+if ([string]::IsNullOrWhiteSpace($version)) {
+    Write-Host "Failed to fetch CmdStan version after $max_attempts attempts."
+    exit 1
+}
