@@ -30,7 +30,7 @@ jobs:
       shell: Rscript {0}
 
     - name: Install the latest Cmdstan
-      uses: ./actions/install-cmdstan
+      uses: ./install-cmdstan
       with:
         cmdstan-version: 'latest'
         num-cores: 2
@@ -52,7 +52,7 @@ jobs:
       shell: Rscript {0}
 
     - name: Install Cmdstan 2.33.1
-      uses: epinowcast/actions/install-cmdstan@main
+      uses: ./install-cmdstan
       with:
         cmdstan-version: '2.33.1'
         num-cores: 1
