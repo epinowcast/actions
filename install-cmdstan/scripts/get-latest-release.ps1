@@ -1,7 +1,7 @@
 # PowerShell script to fetch the latest CmdStan release version with enhanced retry logic
 
 # Initialize retry parameters
-$max_attempts = 5
+$max_attempts = 10
 $wait_time = 5 # seconds
 $version = $null
 
