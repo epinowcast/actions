@@ -11,7 +11,7 @@ else
     exit 1
 fi
 
-retries=3
+retries=10
 wait_time=5
 status=0
 version=""
