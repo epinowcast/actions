@@ -10,7 +10,7 @@ on:
     branches:
       - '*'
   schedule:
-    - corn: '0 1 * * *'
+    - cron: '0 1 * * *'
   workflow_dispatch:  
 
 jobs:
