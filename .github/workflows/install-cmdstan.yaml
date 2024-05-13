@@ -9,6 +9,8 @@ on:
   pull_request:
     branches:
       - '*'
+  schedule:
+    - corn: '0 1 * * *'
   workflow_dispatch:  
 
 jobs:
