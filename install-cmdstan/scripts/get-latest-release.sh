@@ -19,16 +19,29 @@ get_latest_version() {
     local version=""
 
     for ((i=0; i<retries; i++)); do
-        version=$(curl -s https://api.github.com/repos/stan-dev/cmdstan/releases/latest | jq -r '.tag_name' | tr -d 'v')
+        echo "Attempt $((i+1)) of $retries"
+        response=$(curl -s -w "%{http_code}" -o temp.json https://api.github.com/repos/stan-dev/cmdstan/releases/latest)
+        http_code=$(tail -n1 temp.json)
+        version=$(jq -r '.tag_name' temp.json | tr -d 'v')
+        rm temp.json
         status=$?
-        if [ $status -eq 0 ] && [ -n "$version" ]; then
-            echo $version
+        echo "HTTP status code: $http_code"
+        echo "Curl exit status: $status"
+        echo "Fetched version: $version"
+    
+        if [[ $http_code == 200 ]] && [ -n "$version" ]; then
+            echo "Successfully fetched version: $version"
             return 0
+        else
+            echo "Failed to fetch version or bad HTTP status. HTTP status: $http_code, Version fetched: '$version'"
         fi
+    
         sleep $wait_time
+        echo "Sleeping for $wait_time seconds before retrying..."
         wait_time=$((wait_time*2))
     done
-
+    
+    echo "Failed to fetch the latest CmdStan version after $retries attempts."
     return 1
 }
 
