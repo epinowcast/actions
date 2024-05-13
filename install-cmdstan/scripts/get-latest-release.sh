@@ -11,22 +11,19 @@ else
     exit 1
 fi
 
-# Initialize variables for fetching CmdStan version
 retries=3
 wait_time=5
 status=0
 version=""
 
-# Attempt to fetch the latest CmdStan version using GitHub API
 for ((i=0; i<retries; i++)); do
     echo "Attempt $((i+1)) of $retries"
+    # Save the response body to a temporary file and capture HTTP status code separately
     response=$(curl -s -w "%{http_code}" -o temp.json https://api.github.com/repos/stan-dev/cmdstan/releases/latest)
-    http_code=$(tail -n1 temp.json)
+    http_code=$(echo $response | tail -n1)  # Extract the HTTP status code
     version=$(jq -r '.tag_name' temp.json | tr -d 'v')
     rm temp.json
-    status=$?
     echo "HTTP status code: $http_code"
-    echo "Curl exit status: $status"
     echo "Fetched version: $version"
 
     if [[ $http_code == 200 ]] && [ -n "$version" ]; then
