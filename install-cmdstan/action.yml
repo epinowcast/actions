@@ -9,11 +9,15 @@ inputs:
     description: 'Number of cores to use for building CmdStan'
     required: false
     default: '1'
+  github-token:
+    description: The GitHub token used to create an authenticated client
+    default: ${{ github.token }}
+    required: false
 
 runs:
   using: 'composite'
   env:
-    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    GH_TOKEN: ${{ inputs.github-token }}
 
   steps:
     - name: Determine CmdStan Version (Unix)
