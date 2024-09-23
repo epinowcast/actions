@@ -8,7 +8,7 @@ $token = $env:GH_TOKEN
 $auth_str = ""
 
 if (-not [string]::IsNullOrWhiteSpace($token)) {
-  auth_str = "-Authentication Bearer -Token $token"
+  $auth_str = "-Authentication Bearer -Token $token"
 }
 
 for ($attempt = 1; $attempt -le $max_attempts; $attempt++) {
