@@ -10,6 +10,8 @@ if (-not [string]::IsNullOrWhiteSpace($token)) {
   $headers.Add('Accept','application/vnd.github+json')
   $headers.Add('Authorization', -join('Bearer: ', $GH_TOKEN))
   $headers.Add('X-GitHub-Api-Version','2022-11-28')
+} else {
+  Write-Host "No authentication token found in the environment."
 }
 
 for ($attempt = 1; $attempt -le $max_attempts; $attempt++) {
