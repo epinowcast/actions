@@ -12,10 +12,10 @@ inputs:
 
 runs:
   using: 'composite'
-  steps:
-    - env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  env:
+    GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  steps:
     - name: Determine CmdStan Version (Unix)
       if: runner.os != 'Windows' && inputs.cmdstan-version == 'latest'
       run: |
