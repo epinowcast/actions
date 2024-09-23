@@ -8,7 +8,7 @@ $token = $env:GH_TOKEN
 $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 if (-not [string]::IsNullOrWhiteSpace($token)) {
   $headers.Add('Accept','application/vnd.github+json')
-  $headers.Add('Authorization', -join('Bearer: ', $GH_TOKEN))
+  $headers.Add('Authorization', -join('Bearer: ', $token))
   $headers.Add('X-GitHub-Api-Version','2022-11-28')
 } else {
   Write-Host "No authentication token found in the environment."
