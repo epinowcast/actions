@@ -18,11 +18,17 @@ version=""
 
 for ((i=0; i<retries; i++)); do
     echo "Attempt $((i+1)) of $retries"
+    auth_str=""
+    if [ -n "${GH_TOKEN}" ]; then
+        ## we have a github token in the enviroment; set autentication string
+        auth_str+=" -H \"Accept: application/vnd.github+json\""
+        auth_str+=" -H \"Authorization: Bearer $GH_TOKEN\""
+        auth_str+=" -H \"X-GitHub-Api-Version: 2022-11-28\""
+    else
+        echo "No authentication token found in the environment."
+    fi
     # Save the response body to a temporary file and capture HTTP status code separately
-    response=$(curl -s -w "%{http_code}" -L -o temp.json \
-        -H "Accept: application/vnd.github+json" \
-        -H "Authorization: Bearer $GH_TOKEN" \
-        -H "X-GitHub-Api-Version: 2022-11-28" -o temp.json \
+    response=$(curl -s -w "%{http_code}" -L -o temp.json $auth_str \
         https://api.github.com/repos/stan-dev/cmdstan/releases/latest)
     http_code=$(echo $response | tail -n1)  # Extract the HTTP status code
     version=$(jq -r '.tag_name' temp.json | tr -d 'v')

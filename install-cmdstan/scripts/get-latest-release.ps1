@@ -4,11 +4,17 @@
 $max_attempts = 10
 $wait_time = 5 # seconds
 $version = $null
+$token = $env:GH_TOKEN
+$auth_str = ""
+
+if (-not [string]::IsNullOrWhiteSpace($toke)) {
+  auth_str = "-Authentication Bearer -Token $token"
+}
 
 for ($attempt = 1; $attempt -le $max_attempts; $attempt++) {
     try {
         # Using Invoke-RestMethod to fetch the latest release data
-        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -Method Get -ErrorAction Stop -Authentication Bearer -Token $env:GH_TOKEN
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -Method Get -ErrorAction Stop $auth_str
         $version = $response.tag_name -replace '^v', '' # Remove 'v' from version if present
 
         # Check if the version is successfully retrieved

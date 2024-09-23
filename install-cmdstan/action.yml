@@ -25,7 +25,7 @@ runs:
 
     - name: Determine CmdStan Version (Windows)
       if: runner.os == 'Windows' && inputs.cmdstan-version == 'latest'
-      run: ${{ github.action_path }}\scripts\get-latest-release.ps1 ${{ env.GH_TOKEN }}
+      run: ${{ github.action_path }}\scripts\get-latest-release.ps1
       shell: pwsh
 
     - name: Set CmdStan Version (Specified)
