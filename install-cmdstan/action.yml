@@ -13,16 +13,19 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Determine CmdStan Version (Unix)
       if: runner.os != 'Windows' && inputs.cmdstan-version == 'latest'
       run: |
         chmod +x ${{ github.action_path }}/scripts/get-latest-release.sh
-        ${{ github.action_path }}/scripts/get-latest-release.sh ${{ secrets.GITHUB_TOKEN }}
+        ${{ github.action_path }}/scripts/get-latest-release.sh
       shell: bash
 
     - name: Determine CmdStan Version (Windows)
       if: runner.os == 'Windows' && inputs.cmdstan-version == 'latest'
-      run: ${{ github.action_path }}\scripts\get-latest-release.ps1 ${{ secrets.GITHUB_TOKEN }}
+      run: ${{ github.action_path }}\scripts\get-latest-release.ps1 ${{ env.GH_TOKEN }}
       shell: pwsh
 
     - name: Set CmdStan Version (Specified)

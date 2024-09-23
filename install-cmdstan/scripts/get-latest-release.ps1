@@ -1,8 +1,5 @@
 # PowerShell script to fetch the latest CmdStan release version with enhanced retry logic
 
-# Get command line argument (token)
-$token=$args[0]
-
 # Initialize retry parameters
 $max_attempts = 10
 $wait_time = 5 # seconds
@@ -11,7 +8,7 @@ $version = $null
 for ($attempt = 1; $attempt -le $max_attempts; $attempt++) {
     try {
         # Using Invoke-RestMethod to fetch the latest release data
-        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -Method Get -ErrorAction Stop -Authentication Bearer -Token $token
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -Method Get -ErrorAction Stop -Authentication Bearer -Token $env:GH_TOKEN
         $version = $response.tag_name -replace '^v', '' # Remove 'v' from version if present
 
         # Check if the version is successfully retrieved

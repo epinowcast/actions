@@ -11,7 +11,6 @@ else
     exit 1
 fi
 
-token=$1
 retries=10
 wait_time=5
 status=0
@@ -22,7 +21,7 @@ for ((i=0; i<retries; i++)); do
     # Save the response body to a temporary file and capture HTTP status code separately
     response=$(curl -s -w "%{http_code}" -L -o temp.json \
         -H "Accept: application/vnd.github+json" \
-        -H "Authorization: Bearer $token" \
+        -H "Authorization: Bearer $GH_TOKEN" \
         -H "X-GitHub-Api-Version: 2022-11-28" -o temp.json \
         https://api.github.com/repos/stan-dev/cmdstan/releases/latest)
     http_code=$(echo $response | tail -n1)  # Extract the HTTP status code
