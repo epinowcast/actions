@@ -15,7 +15,7 @@ if (-not [string]::IsNullOrWhiteSpace($token)) {
 for ($attempt = 1; $attempt -le $max_attempts; $attempt++) {
     try {
         # Using Invoke-RestMethod to fetch the latest release data
-        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -Method Get -ErrorAction Stop -Header $headers
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -Method Get -ErrorAction Stop -Headers $headers
         $version = $response.tag_name -replace '^v', '' # Remove 'v' from version if present
 
         # Check if the version is successfully retrieved
