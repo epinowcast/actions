@@ -28,7 +28,7 @@ for ((i=0; i<retries; i++)); do
         echo "No authentication token found in the environment."
     fi
     # Save the response body to a temporary file and capture HTTP status code separately
-    response=$(curl -s -w "%{http_code}" -L -o temp.json $auth_str \
+    response=$(eval curl -s -w "%{http_code}" -L -o temp.json $auth_str \
         https://api.github.com/repos/stan-dev/cmdstan/releases/latest)
     http_code=$(echo $response | tail -n1)  # Extract the HTTP status code
     version=$(jq -r '.tag_name' temp.json | tr -d 'v')
