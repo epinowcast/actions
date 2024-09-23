@@ -7,7 +7,7 @@ $version = $null
 $token = $env:GH_TOKEN
 $auth_str = ""
 
-if (-not [string]::IsNullOrWhiteSpace($toke)) {
+if (-not [string]::IsNullOrWhiteSpace($token)) {
   auth_str = "-Authentication Bearer -Token $token"
 }
 
