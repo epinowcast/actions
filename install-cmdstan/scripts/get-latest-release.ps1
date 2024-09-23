@@ -5,16 +5,17 @@ $max_attempts = 10
 $wait_time = 5 # seconds
 $version = $null
 $token = $env:GH_TOKEN
-$auth_str = ""
-
+$headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
 if (-not [string]::IsNullOrWhiteSpace($token)) {
-  $auth_str = "-Authentication Bearer -Token $token"
+  $headers.Add('Accept','application/vnd.github+json')
+  $headers.Add('Authorization', -join('Bearer: ', $GH_TOKEN))
+  $headers.Add('X-GitHub-Api-Version','2022-11-28')
 }
 
 for ($attempt = 1; $attempt -le $max_attempts; $attempt++) {
     try {
         # Using Invoke-RestMethod to fetch the latest release data
-        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -Method Get -ErrorAction Stop $auth_str
+        $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -Method Get -ErrorAction Stop -Header $headers
         $version = $response.tag_name -replace '^v', '' # Remove 'v' from version if present
 
         # Check if the version is successfully retrieved
