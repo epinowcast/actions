@@ -22,7 +22,7 @@ for ($attempt = 1; $attempt -le $max_attempts; $attempt++) {
 
         # Check if the version is successfully retrieved
         if (-not [string]::IsNullOrWhiteSpace($version)) {
-            "CMDSTAN_VERSION=$version" | Out-File -Append -FilePath $env:GITHUB_ENV
+            "CMDSTAN_VERSION=$version" >> $env:GITHUB_ENV
             Write-Host "CmdStan latest version: $version"
             break
         }
