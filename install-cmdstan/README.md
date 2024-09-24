@@ -12,6 +12,11 @@ This action installs and caches [CmdStan](https://mc-stan.org/users/interfaces/c
 
 **Optional** Number of cores to use for building. Default `1`.
 
+### `github-token`
+
+**Optional** The GitHub token used to create an authenticated client. By default
+will use one automatically created by the github action.
+
 ## Example usage
 
 ```yaml

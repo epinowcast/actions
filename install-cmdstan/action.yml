@@ -9,12 +9,18 @@ inputs:
     description: 'Number of cores to use for building CmdStan'
     required: false
     default: '1'
+  github-token:
+    description: The GitHub token used to create an authenticated client
+    default: ${{ github.token }}
+    required: false
 
 runs:
   using: 'composite'
   steps:
     - name: Determine CmdStan Version (Unix)
       if: runner.os != 'Windows' && inputs.cmdstan-version == 'latest'
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
       run: |
         chmod +x ${{ github.action_path }}/scripts/get-latest-release.sh
         ${{ github.action_path }}/scripts/get-latest-release.sh
@@ -22,6 +28,8 @@ runs:
 
     - name: Determine CmdStan Version (Windows)
       if: runner.os == 'Windows' && inputs.cmdstan-version == 'latest'
+      env:
+        GH_TOKEN: ${{ inputs.github-token }}
       run: ${{ github.action_path }}\scripts\get-latest-release.ps1
       shell: pwsh
 
