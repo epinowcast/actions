@@ -18,8 +18,9 @@ for ($attempt = 1; $attempt -le $max_attempts; $attempt++) {
     try {
         # Using Invoke-RestMethod to fetch the latest release data
         $response = Invoke-RestMethod -Uri "https://api.github.com/repos/stan-dev/cmdstan/releases/latest" -Method Get -ErrorAction Stop -Headers $headers
+        Write-Host $response
         $version = $response.tag_name -replace '^v', '' # Remove 'v' from version if present
-
+        Write-Host $version
         # Check if the version is successfully retrieved
         if (-not [string]::IsNullOrWhiteSpace($version)) {
             "CMDSTAN_VERSION=$version" >> $env:GITHUB_ENV
