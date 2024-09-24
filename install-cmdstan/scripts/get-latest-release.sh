@@ -31,10 +31,12 @@ for ((i=0; i<retries; i++)); do
     response=$(eval curl -s -w "%{http_code}" -L -o temp.json $auth_str \
         https://api.github.com/repos/stan-dev/cmdstan/releases/latest)
     http_code=$(echo $response | tail -n1)  # Extract the HTTP status code
-    version=$(jq -r '.tag_name' temp.json | tr -d 'v')
-    rm temp.json
+    if [ -f temp.json ]; then
+      version=$(jq -r '.tag_name' temp.json | tr -d 'v')
+      rm temp.json
+    fi
     echo "HTTP status code: $http_code"
-    echo "Fetched version: $version"
+    [ -z $version ] || echo "Fetched version: $version"
 
     if [[ $http_code == 200 ]] && [ -n "$version" ]; then
         echo "Successfully fetched version: $version"
