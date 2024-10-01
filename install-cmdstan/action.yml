@@ -20,7 +20,7 @@ runs:
     - name: Check if R is set up
       id: check_r
       run: |
-        if [[ "$R_LIBS_USER" == "tempdir/Library" ]]; then
+        if [[ -n "${{ steps.setup-r.outputs.installed-r-version }}" ]]; then
           echo "R is already set up"
           echo "r_setup=true" >> $GITHUB_OUTPUT
         else
