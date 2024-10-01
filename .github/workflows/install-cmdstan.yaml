@@ -52,6 +52,7 @@ jobs:
         num-cores: 1
 
     - name: Validate CmdStan 2.33.1 is installed correctly
+      if: runner.os != 'Windows'
       run: |
         cmdstanr::check_cmdstan_toolchain()
         cmdstanr::set_cmdstan_path("~/.cmdstan/cmdstan-2.33.1")
