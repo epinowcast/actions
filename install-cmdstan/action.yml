@@ -55,16 +55,16 @@ runs:
     - name: Check the CmdStan toolchain and repair it if required
       if: steps.cache-cmdstan.outputs.cache-hit != 'true'
       run: |
-        Rscript -e 'cmdstanr::check_cmdstan_toolchain(fix = TRUE)'
+        Rscript -e "cmdstanr::check_cmdstan_toolchain(fix = TRUE)"
       shell: bash
  
     - name: Install CmdStan using cmdstanr
       if: steps.cache-cmdstan.outputs.cache-hit != 'true'
       run: |
-        Rscript -e 'cmdstanr::install_cmdstan(version = "${{ env.CMDSTAN_VERSION }}", cores = ${{ inputs.num-cores }})'
+        Rscript -e "cmdstanr::install_cmdstan(version = '${{ env.CMDSTAN_VERSION }}', cores = ${{ inputs.num-cores }})"
       shell: bash
 
     - name: Set Cmdstan path
       run: |
-        Rscript -e 'cmdstanr::set_cmdstan_path("~/.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}")'
+        Rscript -e "cmdstanr::set_cmdstan_path('~/.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}')"
       shell: bash
