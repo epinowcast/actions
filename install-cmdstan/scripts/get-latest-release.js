@@ -11,7 +11,7 @@ function getLatestRelease() {
   let version = release.tag_name.replace(/^v/, '');
 
   console.log(`Latest CmdStan version: ${version}`);
-  console.log(`CMDSTAN_VERSION=${version}`);
+  process.stdout.write(`CMDSTAN_VERSION=${version}\n`);
 }
 
 getLatestRelease();
