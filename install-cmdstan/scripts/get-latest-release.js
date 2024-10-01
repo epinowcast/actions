@@ -10,8 +10,9 @@ function getLatestRelease() {
   const release = JSON.parse(output);
   let version = release.tag_name.replace(/^v/, '');
 
-  console.log(`Latest CmdStan version: ${version}`);
-  process.stdout.write(`CMDSTAN_VERSION=${version}\n`);
+  console.error(`Latest CmdStan version: ${version}`);
+  // Set environment variable
+  console.log(`CMDSTAN_VERSION=${version}`);
 }
 
 getLatestRelease();
