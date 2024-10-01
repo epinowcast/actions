@@ -1,6 +1,6 @@
 # Install CmdStan GitHub Action
 
-This action installs and caches [CmdStan](https://mc-stan.org/users/interfaces/cmdstan), allowing specification of version and number of cores for building. It uses [`{cmdstanr}`](https://github.com/stan-dev/cmdstanr) to function and hence depends on `{cmdstanr}` and R.
+This action installs and caches [CmdStan](https://mc-stan.org/users/interfaces/cmdstan), allowing specification of version and number of cores for building. It uses [`{cmdstanr}`](https://github.com/stan-dev/cmdstanr) to function and hence depends on `{cmdstanr}` and R. If these dependencies are not installed it will install them.
 
 ## Inputs
 
@@ -20,14 +20,6 @@ will use one automatically created by the github action.
 ## Example usage
 
 ```yaml
-- name: Set up R
-  uses: r-lib/actions/setup-r@v2
-
-- name: Install cmdstanr
-  run: |
-    install.packages("cmdstanr", repos = c("https://mc-stan.org/r-packages/", getOption("repos")))
-  shell: Rscript {0}
-
 - name: Install cmdstan
   uses: epinowcast/actions/install-cmdstan@v1
   with:
