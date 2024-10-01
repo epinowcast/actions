@@ -20,6 +20,7 @@ will use one automatically created by the github action.
 ## Example usage
 
 ```yaml
+- uses: r-lib/actions/setup-r@v2
 - name: Install cmdstan
   uses: epinowcast/actions/install-cmdstan@v1
   with:
