@@ -17,15 +17,15 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: Check if R is installed
+    - name: Check if R is set up
       id: check_r
       run: |
-        if command -v R >/dev/null 2>&1; then
-          echo "R is already installed"
-          echo "r_installed=true" >> $GITHUB_OUTPUT
+        if [[ "$R_LIBS_USER" == "tempdir/Library" ]]; then
+          echo "R is already set up"
+          echo "r_setup=true" >> $GITHUB_OUTPUT
         else
-          echo "R is not installed"
-          echo "r_installed=false" >> $GITHUB_OUTPUT
+          echo "R is not set up"
+          echo "r_setup=false" >> $GITHUB_OUTPUT
         fi
       shell: bash
 
