@@ -63,8 +63,3 @@ runs:
       run: |
         Rscript -e "cmdstanr::install_cmdstan(version = '${{ env.CMDSTAN_VERSION }}', cores = ${{ inputs.num-cores }})"
       shell: bash
-
-    - name: Set Cmdstan path
-      run: |
-        Rscript -e "cmdstanr::set_cmdstan_path('~/.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}')"
-      shell: bash
