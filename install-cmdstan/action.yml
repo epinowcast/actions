@@ -46,7 +46,7 @@ runs:
       env:
         GH_TOKEN: ${{ inputs.github-token }}
       run: |
-        node ${{ github.action_path }}/scripts/get-latest-release.js >> $GITHUB_ENV
+        node scripts/get-latest-release.js >> $GITHUB_ENV
       shell: bash
 
     - name: Set CmdStan Version (Specified)
