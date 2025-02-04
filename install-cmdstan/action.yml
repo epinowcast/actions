@@ -61,3 +61,9 @@ runs:
       run: |
         Rscript -e 'cmdstanr::set_cmdstan_path("~/.cmdstan/cmdstan-${{ env.CMDSTAN_VERSION }}")'
       shell: bash
+
+    - name: Rebuild CmdStan
+      if: ${{(steps.cache-cmdstan.outputs.cache-hit == 'true') && runner.os == 'macOS'}}
+      run: |
+        Rscript -e 'cmdstanr::rebuild_cmdstan()'
+      shell: bash
