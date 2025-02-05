@@ -43,7 +43,7 @@ jobs:
 
     - name: Check that Cmdstan 2.36.0 can be used to fit a model
       run: |
-        library(cmdstanr)
+        library("cmdstanr")
         set_cmdstan_path("~/.cmdstan/cmdstan-2.36.0")
         file <- file.path(cmdstan_path(), "examples/bernoulli/bernoulli.stan")
         mod <- cmdstan_model(file, force_recompile = TRUE, quiet = FALSE)
