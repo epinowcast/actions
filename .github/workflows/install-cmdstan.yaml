@@ -40,7 +40,7 @@ jobs:
 
     - name: Check that Cmdstan can be used to fit a model
       run: |
-        library(cmdstanr)
+        library("cmdstanr")
         file <- file.path(cmdstan_path(), "examples/bernoulli/bernoulli.stan")
         mod <- cmdstan_model(file)
         stan_data <- list(N = 10, y = c(0,1,0,0,0,0,0,0,0,1))
@@ -65,7 +65,7 @@ jobs:
 
     - name: Check that Cmdstan can be used to fit a model
       run: |
-        library(cmdstanr)
+        library("cmdstanr")
         set_cmdstan_path("~/.cmdstan/cmdstan-2.33.1")
         file <- file.path(cmdstan_path(), "examples/bernoulli/bernoulli.stan")
         mod <- cmdstan_model(file)
