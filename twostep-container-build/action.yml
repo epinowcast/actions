@@ -1,0 +1,253 @@
+name: twostep-container-build
+description: |
+  This action builds a container image in two steps. The first step
+  is used to build the dependencies, and the second step is used to
+  build the main image. The first step is cached to speed up the
+  process. The action is useful when the dependencies are not
+  expected to change often, and the main image is expected to change
+  frequently.
+  
+inputs:
+  container-file-1:
+    description: |
+      The first container file to build.
+    required: true
+  container-file-2: 
+    description: |
+      The second container file to build.
+    required: true
+  first-step-cache-key:
+    description: |
+      The key used to cache the first step of the process. Usually
+      generated using the `hashFiles` function.
+  image:
+    description: |
+      The image to build. For instance, cfa-prod-batch, or cdcgov/cfa-actions.
+    required: true
+  username:
+    description: |
+      The username to use for the container registry login. If this and 'password' 
+      are provided, the action will attempt to use docker/login-action to log in 
+      to the specified registry. Otherwise, it will assume that user has handled 
+      authentication upstream.
+    required: false
+    default: ''
+  password:
+    description: |
+      The password to use for the container registry login. If this
+      and 'username' are provided, the action will attempt to
+      use docker/login-action to log in to the specified registry.
+      Otherwise, it will assume that user has handled authentication 
+      upstream.
+    required: false
+    default: ''
+  registry:
+    description: |
+      The registry to use for the container registry login
+      with trailing slash. For example, ghcr.io/,
+      cfaprodbatchcr.azurecr.io/, etc.
+    required: true
+  main-branch-name:
+    description: |
+      The name of the repository's base branch. Defaults to main.
+    required: false
+    default: 'main'
+  main-branch-tag:
+    description: |
+      The tag to use for the main branch. For instance, latest.
+    required: false
+    default: 'latest'
+  push-image-1:
+    description: |
+      Whether to push the first image. For instance, true.
+    required: false
+    default: 'true'
+  push-image-2:
+    description: |
+      Whether to push the second image. For instance, true.
+    required: false
+    default: 'true'
+  build-args-1:
+    description: |
+      The build arguments to use for the first image.
+    required: false
+  build-args-2:
+    description: |
+      The build arguments to use for the second image.
+    required: false
+  build-labels-1:
+    description: |
+      The labels to use for the first image.
+    required: false
+  build-labels-2:
+    description: |
+      The labels to use for the second image.
+    required: false
+outputs:
+  tag:
+    description: |
+      The tag to used for the image.
+    value: ${{ steps.image-tag.outputs.tag }}
+  branch:
+    description: |
+      The branch name.
+    value: ${{ steps.branch-name.outputs.branch }}
+  summary:
+    description: |
+      The result of the build.
+    value: ${{ steps.final.outputs.result }}
+
+runs:
+  using: 'composite'
+
+  steps:
+
+    - name: Getting the context information
+      shell: bash
+      run: |
+        echo "::group::GitHub context"
+        echo "github.*"
+        echo "action              : ${{ github.action }}"
+        echo "action_path         : ${{ github.action_path }}"
+        echo "action_ref          : ${{ github.action_ref }}"
+        echo "action_repository   : ${{ github.action_repository }}"
+        echo "action_status       : ${{ github.action_status }}"
+        echo "actor               : ${{ github.actor }}"
+        echo "actor_id            : ${{ github.actor_id }}"
+        echo "base_ref            : ${{ github.base_ref }}"
+        echo "env                 : ${{ github.env }}"
+        echo "event_name          : ${{ github.event_name }}"
+        echo "event_path          : ${{ github.event_path }}"
+        echo "graphql_url         : ${{ github.graphql_url }}"
+        echo "head_ref            : ${{ github.head_ref }}"
+        echo "job                 : ${{ github.job }}"
+        echo "path                : ${{ github.path }}"
+        echo "ref                 : ${{ github.ref }}"
+        echo "ref_name            : ${{ github.ref_name }}"
+        echo "ref_protected       : ${{ github.ref_protected }}"
+        echo "ref_type            : ${{ github.ref_type }}"
+        echo "repository          : ${{ github.repository }}"
+        echo "repository_id       : ${{ github.repository_id }}"
+        echo "repository_owner    : ${{ github.repository_owner }}"
+        echo "repository_owner_id : ${{ github.repository_owner_id }}"
+        echo "repositoryUrl       : ${{ github.repositoryUrl }}"
+        echo "retention_days      : ${{ github.retention_days }}"
+        echo "run_id              : ${{ github.run_id }}"
+        echo "run_number          : ${{ github.run_number }}"
+        echo "run_attempt         : ${{ github.run_attempt }}"
+        echo "secret_source       : ${{ github.secret_source }}"
+        echo "::endgroup::"
+
+    - name: Checking out the latest (may be merge if PR)
+      uses: actions/checkout@v4
+
+    # From: https://stackoverflow.com/a/58035262/2097171
+    - name: Extract branch name
+      shell: bash
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: branch-name
+
+    #########################################################################
+    # Getting the tag
+    # The tag will be used for both the docker image and the batch pool
+    #########################################################################
+    - name: Figure out tag (either latest if it is main or the branch name)
+      shell: bash
+      id: image-tag
+      run: |
+        if [ "${{ steps.branch-name.outputs.branch }}" = "${{ inputs.main-branch-name }}" ]; then
+          echo "tag=${{ inputs.main-branch-tag }}" >> $GITHUB_OUTPUT
+        else
+          echo "tag=${{ steps.branch-name.outputs.branch }}" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Login to the Container Registry
+      if: inputs.username != '' && inputs.password != ''
+      uses: docker/login-action@v3
+      with:
+        registry: ${{ inputs.registry }}
+        username: ${{ inputs.username }}
+        password: ${{ inputs.password }}
+
+    - name: Checking if the image exists
+      id: pull-image
+      shell: bash
+      run: |
+        # Ensuring we can pull the image, if cache exists
+        docker pull ${{ inputs.registry }}${{ inputs.image }}:dependencies-${{ steps.image-tag.outputs.tag }} || \
+          export IMAGE_NOT_FOUND=tue
+
+        if [ -n "$IMAGE_NOT_FOUND" ]; then
+          echo "Image was not found, it will be built."
+          echo "image-found=false" >> $GITHUB_OUTPUT
+        else
+          echo "Image found, we will inspect the labels to check for cache."
+          echo "image-found=true" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Checking if matches cache
+      if: steps.pull-image.outputs.image-found == 'true'
+      id: cache
+      shell: bash
+      run: |
+
+        # Inspecting the image
+        docker inspect \
+          ${{ inputs.registry }}${{ inputs.image }}:dependencies-${{ steps.image-tag.outputs.tag }} \
+          --format='{{ index .Config.Labels "TWO_STEP_BUILD_CACHE_KEY" }}' > \
+          ${{ github.sha }}_cache_hash
+        
+        if [ "$(cat ${{ github.sha }}_cache_hash)" != "${{ inputs.first-step-cache-key }}" ]; then
+          echo "Cache hash does not match. Rebuilding the image..."
+          echo "cache-hit=false" >> $GITHUB_OUTPUT
+        else
+          echo "Cache hash matches (all good!)."
+          echo "cache-hit=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Build and push
+      if: steps.cache.outputs.cache-hit != 'true' || steps.pull-image.outputs.image-found != 'true'
+      uses: docker/build-push-action@v6
+      with:
+        no-cache: true
+        push: ${{ inputs.push-image-1 }}
+        tags: |
+          ${{ inputs.registry }}${{ inputs.image }}:dependencies-${{ steps.image-tag.outputs.tag }}
+        file: ${{ inputs.container-file-1 }}
+        build-args: ${{ inputs.build-args-1 }}
+        labels: |
+          ${{ inputs.build-labels-1 }}
+          TWO_STEP_BUILD_CACHE_KEY=${{ inputs.first-step-cache-key }}
+
+
+    - name: Build and push the main image
+      id: build_and_push_model_image
+      uses: docker/build-push-action@v6
+      with:
+        no-cache: true
+        push: ${{ inputs.push-image-2 }}
+        tags: |
+          ${{ inputs.registry }}${{ inputs.image }}:${{ steps.image-tag.outputs.tag }}
+        file: ${{ inputs.container-file-2 }}
+        build-args: |
+          ${{ inputs.build-args-2 }}
+          TAG=dependencies-${{ steps.image-tag.outputs.tag }}
+        labels: |
+          ${{ inputs.build-labels-2 }}
+          TWO_STEP_BUILD_CACHE_KEY=${{ inputs.first-step-cache-key }}
+
+    - name: Set the final result
+      id: final
+      shell: bash
+      run: |
+        # Three possible cases:
+        # - The image did not exist, so we built it
+        # - The image existed, but the cache did not match, so we rebuilt it
+        # - The image existed, and the cache matched, so we did not rebuild it
+        if [ "${{ steps.cache.outputs.cache-hit }}" == "" ]; then
+          echo "result=built" >> $GITHUB_OUTPUT
+        elif [ "${{ steps.cache.outputs.cache-hit }}" == "false" ]; then
+          echo "result=rebuilt" >> $GITHUB_OUTPUT
+        else
+          echo "result=cached" >> $GITHUB_OUTPUT
+        fi
