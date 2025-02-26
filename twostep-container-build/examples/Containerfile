@@ -1,6 +1,6 @@
 # Collection of ARGs
 ARG TAG=dependencies-latest
-ARG IMAGE=ghcr.io/cdcgov/cfa-actions
+ARG IMAGE=ghcr.io/epinowcast/actions
 ARG GH_SHA=default_var
 
 FROM ${IMAGE}:${TAG}

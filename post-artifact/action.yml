@@ -73,7 +73,7 @@ runs:
       if: ${{ github.event_name != 'pull_request' }}
       run: 
         echo "This action must only run in pull requests."
-        echo "See https://github.com/CDCgov/cfa-actions for more information."
+        echo "See https://github.com/epinowcast/actions for more information."
         exit 1
       shell: bash
 

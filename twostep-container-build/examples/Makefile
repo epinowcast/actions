@@ -3,7 +3,7 @@ TAG := latest
 endif
 
 ifndef IMAGE
-IMAGE := ghcr.io/cdcgov/cfa-actions
+IMAGE := ghcr.io/epinowcast/actions
 endif
 
 ifndef ENGINE

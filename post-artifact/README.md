@@ -1,4 +1,4 @@
-# Post artifact as a comment [![Test PR post artifact](https://github.com/CDCgov/cfa-actions/actions/workflows/test-post-artifact.yml/badge.svg)](https://github.com/CDCgov/cfa-actions/actions/workflows/test-post-artifact.yml)
+# Post artifact as a comment [![Test PR post artifact](https://github.com/epinowcast/actions/actions/workflows/test-post-artifact.yml/badge.svg)](https://github.com/epinowcast/actions/actions/workflows/test-post-artifact.yml)
 
 ## Inputs
 
@@ -35,7 +35,7 @@ Here are the contents of a job that (i) uploads an artifact using `actions/uploa
 
       # Post the artifact pulling the id from the `readme` step.
       - name: Post the artifact
-        uses: CDCgov/cfa-actions/post-artifact@1.2.0
+        uses: epinowcast/actions/post-artifact@v1.1.0
         if: ${{ github.event_name == 'pull_request' }}
         with:
           artifact-name: readme
@@ -87,7 +87,7 @@ jobs:
       # The msg will refer to the arfitact as 'README file'.
       - name: Post the artifact
         if: ${{ github.event_name == 'pull_request' }}
-        uses: CDCgov/cfa-actions/post-artifact@main
+        uses: epinowcast/actions/post-artifact@main
         with:
           artifact-name: readme
           gh-token: ${{ secrets.GITHUB_TOKEN }}

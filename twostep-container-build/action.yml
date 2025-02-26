@@ -22,7 +22,7 @@ inputs:
       generated using the `hashFiles` function.
   image:
     description: |
-      The image to build. For instance, cfa-prod-batch, or cdcgov/cfa-actions.
+      The image to build. For instance, cfa-prod-batch, or epinowcast/actions.
     required: true
   username:
     description: |

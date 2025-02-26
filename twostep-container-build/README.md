@@ -94,7 +94,7 @@ jobs:
         
       - name: Build and push image
         id: build-push
-        uses: CDCgov/cfa-actions/twostep-container-build@v1.2.1
+        uses: epinowcast/actions/twostep-container-build@v1.1.0
         with:
           container-file-1: ./Containerfile.dependencies
           container-file-2: ./Containerfile
@@ -109,7 +109,7 @@ jobs:
 
 ## Example: Using ghcr.io
 
-The workflow is triggered on pull requests and pushes to the main branch. The image is pushed to `ghcr.io` and the image name is `cdcgov/cfa-actions` (full name is `ghcr.io/cdcgov/cfa-actions`). A functional version of this workflow is executed [here](../.github/workflows/test-twostep-container-build.yml).
+The workflow is triggered on pull requests and pushes to the main branch. The image is pushed to `ghcr.io` and the image name is `epinowcast/actions` (full name is `ghcr.io/epinowcast/actions`). A functional version of this workflow is executed [here](../.github/workflows/test-twostep-container-build.yml).
 
 ```yaml
 name: Building the container and put it on ghcr.io
@@ -136,7 +136,7 @@ jobs:
         name: Checkout code
 
       - name: Two-step build
-        uses: CDCgov/cfa-actions/twostep-container-build@v1.2.0
+        uses: epinowcast/actions/twostep-container-build@v1.2.0
         with:
           # Login information
           registry: ghcr.io/
@@ -152,7 +152,7 @@ jobs:
 
           # The image to build includes the organization (that's how it is
           # on ghcr.io)
-          image: cdcgov/cfa-actions
+          image: epinowcast/actions
 
 ```
 
@@ -173,7 +173,7 @@ CMD ["bash"]
 ```Containerfile
 # Collection of ARGs
 ARG TAG=dependencies-latest
-ARG IMAGE=ghcr.io/cdcgov/cfa-actions
+ARG IMAGE=ghcr.io/epinowcast/actions
 ARG GH_SHA=default_var
 
 FROM ${IMAGE}:${TAG}

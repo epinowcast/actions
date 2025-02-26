@@ -35,4 +35,4 @@ jobs:
           first-step-cache-key: ${{ hashFiles('Containerfile.dependencies') }}
           # The image to build includes the organization (that's how it is
           # on ghcr.io)
-          image: cdcgov/cfa-actions
+          image: epinowcast/actions
